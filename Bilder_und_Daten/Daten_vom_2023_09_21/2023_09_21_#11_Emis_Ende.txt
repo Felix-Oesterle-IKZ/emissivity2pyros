@@ -1,0 +1,16 @@
+Auflistung der Emissionsgrade:
+Datum: 2023_09_21
+
+Version: 0
+
+Vergleichsgeräte für die Pyrometeranpassung: Pyro. (SW, Ratio)
+
+Rezept:
+-------
+Solltemperaturen:     ['260', '261', '275', '276', '290', '291']
+Regelbereich:         ['10', '10', '10', '10', '10', '10']
+Zeit im Regelbereich: ['1', '1', '1', '1', '1', '1']
+
+Emissionsrad ist 100 % - wenn keine Anpassung vorgenommen wird!
+
+Soll. Temperatur         Vergleichs-Temperatur              Emiss. Pyro. (SW, Adv 6/23) [%]    Emissions-Messgerät
