@@ -47,6 +47,8 @@ class PyrometerLumasense:
             self.set_t90(config["t90"])
         self.meas_data = []
         self.listT = []
+        self.listTavg = []
+        self.N = 15
 
     def _get_ok(self):
         """Check if command was accepted."""
@@ -255,10 +257,30 @@ class PyrometerLumasense:
     # Temperatur Grafik:
     def update_list_T(self):
         self.listT.append(self.sample())
-
+        arr = self.listT
+        #print(self.listT)
+        
+        if len(arr) > self.N:
+            self.listTavg = []
+            for i in range(len(arr) - self.N + 1):
+                window = arr[i : i + self.N]
+                window_average = round(sum(window) / self.N, 2)
+                self.listTavg.append(window_average)
+                #print(f"cy{i}:{self.listTavg}")
+                
+            for i in range(len(self.listTavg), len(self.listT)):
+                self.listTavg.append(self.listTavg[-1])
+        else:
+            self.listTavg = self.listT
+        
+        
     def grafik_T(self, graph, x_list):
-        self.lineT, = graph.plot(x_list, self.listT, label=self.name)
+        self.lineT,    = graph.plot(x_list, self.listT, label=self.name)
+        self.lineTavg, = graph.plot(x_list, self.listTavg, label=f"{self.name} (avg)")
 
     def update_T(self, x_list):
         self.lineT.set_xdata(x_list)               
         self.lineT.set_ydata(self.listT)
+        
+        self.lineTavg.set_xdata(x_list) 
+        self.lineTavg.set_ydata(self.listTavg)

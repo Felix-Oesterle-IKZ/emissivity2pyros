@@ -2,7 +2,7 @@
 
 Pyrometer_KW:
   Pyro. (SW, Adv 6/23):
-    com:      '/dev/ttyUSB2'    
+    com:      '/dev/ttyUSB1'    
     bd:       115200              
     parity:   'E'
     stopbits: 1
@@ -14,7 +14,7 @@ Pyrometer_KW:
 IGAR-6-adv:  # Ratio pyrometer
     # comment: your comment for nomad ELN
   serial-interface:
-    port: '/dev/ttyUSB1'
+    port: '/dev/ttyUSB0'
     baudrate: 115200
     bytesize: 8
     stopbits: 1
@@ -72,7 +72,7 @@ Pt100:
 
 Heizer:
   Schnittstelle:
-    com:      '/dev/ttyUSB0'   
+    com:      '/dev/ttyUSB2'   
     bd:       9600              # Emulation: 19200 (8N1) - Eurotherm/IKA: 9600 (7E1)
     parity:   'E'
     stopbits: 1

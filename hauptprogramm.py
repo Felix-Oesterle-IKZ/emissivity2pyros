@@ -468,7 +468,6 @@ def get_Measurment():                                                     # Aufn
     
     temppyro2 = pyro2.sample()
     temppyro2List.append(temppyro2)
-    #print(temppyro2List)
     
     for name, Pyro in pyroLW.items():
         Pyro.update_list_T()
@@ -494,9 +493,9 @@ def get_Measurment():                                                     # Aufn
     if args.log == True:   logging.info('Messwerte geholt und Listen aktualisiert')
 
     # Vergleichstemperatur für Anpassung bestimmen:
-    tempVergleichPyro = temppyro2List[-1]                  # Wenn kein Vergleichssensor unter den Adafruit Pt100 ausgewählt, dann wird der Regelsensor ausgewählt!
+    tempVergleichPyro = pyro2.listTavg[-1]                  # Wenn kein Vergleichssensor unter den Adafruit Pt100 ausgewählt, dann wird der Regelsensor ausgewählt!
     if tempVergleichPyro == 0:                          # Fehlerbehandlung (bei Null wird der alte Wert wieder genommen!)
-        tempVergleichPyro = temppyro2List[-2]
+        tempVergleichPyro = pyro2.listTavg[-2]
         if args.log == True:   logging.info('Vergleichstemperatur war Null!')
     
     
@@ -575,9 +574,10 @@ def get_Measurment():                                                     # Aufn
             StartConfig = True                                                          # verriegelt das if bis nächsten Zyklus oder bei vorzeitigen Sollwertbereich austritt# Emissionsgrad Anpassung - Ziel Temp.Oberfläche = Temp.Pyro - Files werden beschrieben:
         
         ### Emissionsanpassug
-            
+        
         if EmisMessGerät == "pyro":                                                                # das soll nur 16 mal durchgeführt werden, da die Rundung nah 10 - 13 Durschgängen keine Änderung mehr bringt
-            if nEMess <= 30:
+            
+            if nEMess < 30:
                 with open(Folder + '/' + FileOutNameE,"a", encoding="utf-8") as foE:        # Anpassung durchführen
                     foE.write(f'{time_abs:<15}{dt:<15.1f}')
                     for name, Pyro in pyroKW.items():
@@ -603,10 +603,11 @@ def get_Measurment():                                                     # Aufn
                         foEE.write(f'{Pyro.e_py:<35}')
                     foEE.write("pyro".ljust(15))
                     foEE.write('\n')
+                    nEMess += 1
             Emis_Update()
                         
         elif EmisMessGerät == "pt":
-            if nEMess <= 30:
+            if nEMess < 30:
                 with open(Folder + '/' + FileOutNameE,"a", encoding="utf-8") as foE:        # Anpassung durchführen
                     foE.write(f'{time_abs:<15}{dt:<15.1f}')
                     for name, Pyro in pyroKW.items():
@@ -632,6 +633,7 @@ def get_Measurment():                                                     # Aufn
                         foEE.write(f'{Pyro.e_py:<35}')
                     foEE.write("pt".ljust(15))
                     foEE.write('\n')
+                    nEMess += 1
             Emis_Update() 
         else:
             print("ERROR: EmisMessGerät muss 'pyro' oder 'pt' sein!")
@@ -1072,19 +1074,22 @@ cp.read(Config_File)
 for section_name in cp.sections():                      # Die Überschriften in der datei durch gehen
     if section_name == 'Heating':                       # Unter "Heating" steht das Rezept
          for name, zeile in cp.items(section_name):
-            TempTrep.append(zeile.split(',')[0])        # Erster Wert in der Zeile ist der Sollwert des Zykluses
-            TempArea.append(zeile.split(',')[1])        # Zweiter Wert ist die Sollwertbereichs Grenze (Sollwert +/- Grenze)
-            TempTime.append(zeile.split(',')[2])        # Dritter Wert ist die Zeit in dem der Istwert in dem Sollwertbereich sein soll
-            TempStationar.append(zeile.split(',')[3])   # Vierter Wert gibt an wie Stationär die Temp sein soll
+            TempTrep.append(zeile.split(',')[0])           # Erster Wert in der Zeile ist der Sollwert des Zykluses
+            TempArea.append(zeile.split(',')[1])           # Zweiter Wert ist die Sollwertbereichs Grenze (Sollwert +/- Grenze)
+            TempTime.append(zeile.split(',')[2])           # Dritter Wert ist die Zeit in dem der Istwert in dem Sollwertbereich sein soll
+            TempStationar.append(zeile.split(',')[3])      # Vierter Wert gibt an wie Stationär die Temp sein soll
             TempStationarTime.append(zeile.split(',')[4])  # Fünfter Wert gib an wie lang die Temeratur Stationär sein muss bis angefangen wird zu messen in minuten anzugeben
-            EmisMessGerätListe.append(zeile.split(',')[5])
+            EmisMessGerätListe.append(zeile.split(',')[5]) # gibt an welches Messgerät benutzt wid, "pyro" oder "pt" sind möglich
 
 print('Start des Rezeptes')
-print(f'Sollwerte         = {TempTrep}')
-print(f'Sollwertbereich   = {TempArea}')
-print(f'Zeiten im Bereich = {TempTime}')
-print(f'Stationärer Bereich = {TempStationar}')
-print(f"EmisMessGerät = {EmisMessGerätListe}")
+print(f'Sollwerte                     = {TempTrep}')
+print(f'Sollwertbereiche              = {TempArea}')
+print(f'Zeiten im Bereich             = {TempTime}')
+print(f'Stationärer Bereich           = {TempStationar}')
+print(f'Zeiten im stationären Bereich = {TempStationarTime}')
+print(f"EmisMessGeräte                = {EmisMessGerätListe}")
+print()
+
 if args.log == True:   logging.info('Rezept Eingelesen')
 
 # GUI öffnen:
